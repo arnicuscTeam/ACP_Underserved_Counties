@@ -472,6 +472,10 @@ def get_census_data(data_dir: str):
             if column in variables.keys():
                 census_df.rename(columns={column: variables[column]}, inplace=True)
 
+        census_df["state"] = census_df["state"].str.zfill(2)
+        census_df["county"] = census_df["county"].str.zfill(3)
+        census_df["tract"] = census_df["tract"].str.zfill(6)
+
         census_df["Tract"] = census_df['state'] + census_df['county'] + census_df['tract']
 
         census_df = census_df.drop(columns=['state', 'county', 'tract'])
