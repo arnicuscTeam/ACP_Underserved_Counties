@@ -748,7 +748,7 @@ def collectCompNamesUSA(data_dir: str):
         small_df.loc[small_df["Company Name"] == company, "EBB2023"] = ebb_sum
 
     # Write out the dataframe to a csv file
-    small_df.to_csv(awards_dir + "usa_spending_companies.csv", index=False)
+    small_df.to_csv(awards_dir + "Current_Spending.csv", index=False)
 
 
 def combineBDCwithUSA(data_dir: str):
@@ -764,7 +764,7 @@ def combineBDCwithUSA(data_dir: str):
 
     # Set the path to the files
     bdc_file = isp_folder + "unique_providers_bdc.csv"
-    usa_spending_file = awards_folder + "usa_spending_companies.csv"
+    usa_spending_file = awards_folder + "Current_Spending.csv"
 
     # The File contains the companies that have used multiple names
     cross_dict_file = awards_folder + "same_company.csv"
