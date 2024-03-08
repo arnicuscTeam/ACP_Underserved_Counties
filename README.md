@@ -16,17 +16,17 @@ The three choices of the categorization are:
 2. Tribal
 3. High Cost
 
-To collect the rural counties, we downloaded the covered populations file from the Census, which can be found under 
+To identify rural counties, we downloaded the covered populations file from the Census Bureau, which can be found under 
 https://www.census.gov/programs-surveys/community-resilience-estimates/partnerships/ntia/digital-equity.html. Here, 
-the census determined if a county was considered rural.
+the Census Bureau determined if a county is considered rural.
 
-To collect the tribal counties, we downloaded the Shapefile of Tribal blocks provided by USAC, which can be downloaded
+To identify tribal counties, we downloaded the shapefile of Tribal blocks provided by USAC, which can be downloaded
 using https://www.usac.org/wp-content/uploads/lifeline/documents/tribal/shapefile-of-tribal-lands.zip. Since the blocks
 are not identified in this file, we used ArcGIS and overlayed the tribal blocks with the tabulation blocks to determine
 which blocks were tribal. From here, we aggregated the number of people that lived in these tribal blocks, and if the
 majority of the population within that county was in a tribal block, then the county was categorized as tribal.
 
-To collect the high-cost counties, we downloaded the high_cost areas file provided by the NTIA, which can be found under 
+To identify high-cost counties, we downloaded the high_cost areas file provided by the NTIA, which can be found under 
 https://www.internet4all.gov/program/broadband-equity-access-and-deployment-bead-program/bead-allocation-methodology.
 From here, we aggregated the number of people that lived in these High-Cost block groups and if the majority of the 
 population within that county was in a high-cost block group, then the county was categorized as high-cost.
@@ -37,7 +37,7 @@ The county filters are the following:
 1. Median Household Income
 2. Percent Units Served by Broadband
 
-To collect the median household income, we used the 2022 ACS 5-year API to collect the median household income for each
+For median household income, we used the 2022 ACS 5-year API to collect the median household income for each
 county. The list of available APIs can be found under https://www.census.gov/data/developers/data-sets.html. The code
 to collect the census data can be found under [get_census_data_county](Code/collect_census_data.py).
 
