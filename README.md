@@ -42,8 +42,8 @@ county. The list of available APIs can be found under https://www.census.gov/dat
 to collect the census data can be found under [get_census_data_county](Code/collect_census_data.py).
 
 To collect the percent units served by broadband, we used the FCC's Broadband Deployment data, which can be found under
-https://broadbandmap.fcc.gov/home. We downloaded the national data and filtered so that All wired and licensed fixed
-wireless technologies were included, with a minimum advertised speed of 25/3, only at the residential level. This data
+https://broadbandmap.fcc.gov/home. We downloaded the national data and filtered so that all wired and licensed fixed
+wireless technologies were included, with a minimum advertised speed of 25/3Mbps, only for residential service. This data
 is available at the county level.
 
 ### Race/Ethnicity
@@ -82,8 +82,8 @@ The scatterplot is composed of the following:
 7. High Cost
 
 To collect the percent units served by broadband, we used the FCC's Broadband Deployment data, which can be found under
-https://broadbandmap.fcc.gov/home. We downloaded the national data and filtered so that All wired and licensed fixed
-wireless technologies were included, with a minimum advertised speed of 25/3, only at the residential level. This data
+https://broadbandmap.fcc.gov/home. We downloaded the national data and filtered so that all wired and licensed fixed
+wireless technologies were included, with a minimum advertised speed of 25/3Mbps (residential only). This data
 is available at the county level.
 
 To collect the median household income, we used the 2022 ACS 5-year API. The list  of available APIs can be found under 
@@ -98,7 +98,7 @@ To collect the rural counties, we downloaded the covered populations file from t
 https://www.census.gov/programs-surveys/community-resilience-estimates/partnerships/ntia/digital-equity.html. Here,
 the census determined if a county was considered rural.
 
-To collect the tribal counties, we downloaded the Shapefile of Tribal blocks provided by USAC, which can be downloaded
+To collect the tribal counties, we downloaded the shapefile of Tribal blocks provided by USAC, which can be downloaded
 using https://www.usac.org/wp-content/uploads/lifeline/documents/tribal/shapefile-of-tribal-lands.zip. Since the blocks
 are not identified in this file, we used ArcGIS and overlayed the tribal blocks with the tabulation blocks to determine
 which blocks were tribal. From here, we aggregated the number of people that lived in these tribal blocks, and if the
@@ -112,12 +112,12 @@ population within that county was in a high-cost block group, then the county wa
 
 ## Other Data in Report
 
-The data referenced in the difference in differences sections of the report is panel data collected from the ACS over a 
-period of 6 years, from 2016 to 2022, excluding 2020. The data was collected using the 1-year ACS API, which can be 
+The data referenced in the difference in differences sections of the report is panel data collected from the ACS 1-year estimates over a 
+period of 6 years, from 2016 to 2022, excluding 2020 for which data is not available. The data was collected using the 1-year ACS API, which can be 
 found under https://www.census.gov/data/developers/data-sets.html. The code to collect the census data can be found 
 under [get_county_panel_internet_data](Code/collect_census_data.py).
 
-To determine the income threshold that we used, we collected PUMS 2022 data from the Census Bureau. In depth explanation
+To determine the income threshold (Appendix A), we collected PUMS 2022 data from the Census Bureau. In depth explanation
 of this step can be found in the readme found in the following repository: 
 https://github.com/arnicuscTeam/ACP-Eligibility. The section titled American Community Survey PUMS (ACS PUMS) explains
 how the data was collected, cleaned, crosswalked, and used. The code used to collect, clean, and crosswalk the data can
