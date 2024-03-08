@@ -1510,3 +1510,31 @@ def get_county_panel_internet_data(state_num: str):
                 main_df = main_df.drop_duplicates(subset=["County"], keep="first")
 
     return main_df
+
+
+def determine_income_threshold(data_dir, data_year):
+    state_data_folder = data_dir + f"ACS_PUMS/{data_year}_Data/state_data/"
+
+    states = ["ca", "tx", "oh", "al"]
+    full_dc = {state + "_" + str(x) + "K": 0 for state in states for x in range(30, 71, 10)}
+
+    for state in states:
+        file = f"{state_data_folder}{state}/{state}-eligibility-county.csv"
+
+        df = pd.read_csv(file)
+
+        df["acp_eligible"] = 0
+
+        df.loc[(df["POVPIP"] <= 200) | (df["has_pap"] == 1) | (df["has_ssip"] == 1) | (df["has_hins4"] == 1) | (
+                df["has_snap"] == 1), "acp_eligible"] = 1
+
+        for x in range(30, 71, 10):
+            df2 = df[df["HH Income"] <= x * 1000]
+
+            total_hh = df2["WGTP"].sum()
+
+            df2 = df2[df2["acp_eligible"] == 1]
+
+            full_dc[state + "_" + str(x) + "K"] = round(df2["WGTP"].sum() * 100 / total_hh, 2)
+
+    print(full_dc)

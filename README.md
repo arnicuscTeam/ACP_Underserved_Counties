@@ -117,6 +117,12 @@ period of 6 years, from 2016 to 2022, excluding 2020. The data was collected usi
 found under https://www.census.gov/data/developers/data-sets.html. The code to collect the census data can be found 
 under [get_county_panel_internet_data](Code/collect_census_data.py).
 
-
-
-
+To determine the income threshold that we used, we collected PUMS 2022 data from the Census Bureau. In depth explanation
+of this step can be found in the readme found in the following repository: 
+https://github.com/arnicuscTeam/ACP-Eligibility. The section titled American Community Survey PUMS (ACS PUMS) explains
+how the data was collected, cleaned, crosswalked, and used. The code used to collect, clean, and crosswalk the data can
+be found in the [collect_pums_data.py](Code/collect_pums_data.py) file. The code used to download and clean the
+crosswalk files can be found in the [geocorr.py](Code/geocorr.py) file.
+Once all the PUMS data was crosswalked to the county level, we used the following function to determine the income
+distribution at the county level for four different states: California, Texas, Ohio, and Alabama. The function can be
+found in the [determine_income_threshold](Code/collect_census_data.py) file.
