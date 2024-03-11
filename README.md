@@ -2,7 +2,7 @@
 
 This repo contains the information and files to fact check and data check delierable #2 of the Measuring the Effectiveness of Digital Inclusion Approaches (MEDIA) project - phase 2
 The report title is Evaluating the Impact of the Affordable Connectivity Program. The word file is [here](/Deliverable2.docx) See the comments in the file that refer each section to different datasets and code.
-The final files are in Stata format, and can be found [here]
+The final files are in Stata format, and can be found [here](Data/Stata_final_files)
 
 ## Interactive Map Data
 
