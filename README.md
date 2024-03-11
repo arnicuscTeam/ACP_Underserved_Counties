@@ -1,5 +1,8 @@
 # ACP Underserved Counties (Deliverable #2)
 
+This repo contains the information and files to fact check and data check delierable #2 of the Measuring the Effectiveness of Digital Inclusion Approaches (MEDIA) project - phase 2
+The report title is Evaluating the Impact of the Affordable Connectivity Program. The file is [here](/Deliverable  #2 data check.doc).
+
 ## Interactive Map Data
 
 The data for the interactive map is composed of four different parts:
