@@ -69,3 +69,5 @@ distribution at the county level for four different states: California, Texas, O
 found in the [determine_income_threshold](Code/collect_census_data.py) file.
 
 # 2. FACT CHECK
+
+All files referenced in the report are included in pdf format [here](Data/fact_check_docs.zip)
