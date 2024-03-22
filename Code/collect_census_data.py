@@ -1,22 +1,10 @@
 import os
-import random
-import shutil
-import time
 import urllib.request
 import zipfile
-from datetime import datetime
 import geopandas as gpd
 
 import pandas as pd
 import requests
-from selenium import webdriver
-from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.common.action_chains import ActionChains
-from selenium.webdriver.common.by import By
-from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.support.ui import WebDriverWait
-from webdriver_manager.chrome import ChromeDriverManager  # pip install webdriver_manager
 
 
 def downloadShapeFiles_Block_Group(data_dir: str):
@@ -760,6 +748,7 @@ def get_census_data_tract(data_dir: str, date: str = "06_30_2023"):
         census_df = census_df.drop(columns=["One person household", "Two person household", "Three person household",
                                             "Four or more person household"])
 
+        # Merge the dataframes that were collected earlier so that we can have one full, large dataframe
         census_df = census_df.merge(acp_df, on="Tract", how="left")
         census_df = census_df.merge(covered_df, on="Tract", how="left")
         census_df = census_df.merge(pop_density_df, on="Tract", how="left")
@@ -786,10 +775,14 @@ def get_census_data_tract(data_dir: str, date: str = "06_30_2023"):
         census_df[f"Total ACP Subscribed Households as of {most_recent_date}"] = census_df[
             f"Total ACP Subscribed Households as of {most_recent_date}"].astype(int)
 
+        # Create the High Cost column if the tract is in the high cost dictionary and the high cost population is
+        # greater than or equal to 50% of the total population
         census_df["High Cost"] = census_df.apply(lambda x: 1 if x["Tract"] in high_cost_dict.keys() and
                                                                 high_cost_dict[x["Tract"]] >= x[
                                                                     "Total Population"] * 0.5 else 0, axis=1)
 
+        # Create the Tribal column if the tract is in the tribal dictionary and the tribal population is greater than or
+        # equal to 50% of the total population
         census_df["Tribal"] = census_df.apply(lambda x: 1 if x["Tract"] in tribal_dict.keys() and
                                                              tribal_dict[x["Tract"]] >= x[
                                                                  "Total Population"] * 0.5 else 0, axis=1)
@@ -900,15 +893,23 @@ def get_census_data_county(data_dir: str, date: str = "06_30_2023"):
 
         tribal_dict[county] = total_tribal_pop
 
+    """
+    Collect the data regarding what percentage of the county is served by fixed broadband
+    """
+
     served_file = data_dir + "Census_Data/Census_Mid_Files/county_fixed_served.csv"
 
+    # Read the served file
     served_df = pd.read_csv(served_file, dtype={"geography_id": str})
 
+    # Fill in the leading zeros for the geography_id
     served_df["geography_id"] = served_df["geography_id"].str.zfill(5)
 
+    # Rename the columns
     served_df = served_df.rename(columns={"geography_id": "County",
                                           "Calculated percentage of units for broadband serviceable locations contained within the geography for which providers report residential fixed broadband service with Copper, Cable, Fiber to the Premises, or Licensed Fixed Wireless technology and speeds of at least 25 / 3 Mbps.": "Served Percentage"})
 
+    # Keep only the columns we need for the analysis
     served_df = served_df[["County", "Served Percentage"]]
 
     # Create a dictionary to store the state abbreviations
@@ -1344,34 +1345,52 @@ def get_census_data_county(data_dir: str, date: str = "06_30_2023"):
         if not os.path.exists(panel_data_folder):
             os.mkdir(panel_data_folder)
 
+        # Collect the panel data for each county in the current state using the get_county_panel_internet_data function
         panel_df = get_county_panel_internet_data(key)
 
+        # If the full panel data is empty, set it to the panel data
         if full_panel_df.empty:
             full_panel_df = panel_df
 
+        # Otherwise, concatenate the panel data to the full panel data
         else:
             full_panel_df = pd.concat([full_panel_df, panel_df], ignore_index=True)
 
+        # Save the panel data to a csv file
         panel_df.to_csv(panel_data_folder + value + "_Panel_Data.csv", index=False)
 
+        # Combine the panel data to the census data
         census_df = census_df.merge(panel_df, on="County", how="left")
 
+        # Combine the apc household data to the census data
         census_df = census_df.merge(acp_df, on="County", how="left")
+
+        # Combine the covered population data to the census data
         census_df = census_df.merge(covered_df, on="County", how="left")
+
+        # Combine the population density data to the census data
         census_df = census_df.merge(pop_density_df, on="County", how="left")
+
+        # Combine the provider data to the census data
         census_df = census_df.merge(provider_df, on="County", how="left")
+
+        # Combine the served data to the census data
         census_df = census_df.merge(served_df, on="County", how="left")
 
+        # Fill in the missing values with 0
         census_df[f"Total ACP Subscribed Households as of {most_recent_date}"] = census_df[
             f"Total ACP Subscribed Households as of {most_recent_date}"].fillna(0)
         census_df[f"Total ACP Subscribed Households as of {most_recent_date}"] = census_df[
             f"Total ACP Subscribed Households as of {most_recent_date}"].astype(int)
 
+        # Fill in the missing values with 0
         census_df["rural"] = census_df["rural"].fillna(0)
         census_df["rural"] = census_df["rural"].astype(int)
 
+        # Fill in the missing values with 0
         census_df["pop_density"] = census_df["pop_density"].fillna(0)
 
+        # Turn all the columns into integers
         census_df["ISPs Count"] = census_df["ISPs Count"].fillna(0)
         census_df["ISPs Count"] = census_df["ISPs Count"].astype(int)
         census_df["ISPs ACP Count"] = census_df["ISPs ACP Count"].fillna(0)
@@ -1383,14 +1402,17 @@ def get_census_data_county(data_dir: str, date: str = "06_30_2023"):
         census_df[f"Total ACP Subscribed Households as of {most_recent_date}"] = census_df[
             f"Total ACP Subscribed Households as of {most_recent_date}"].astype(int)
 
+        # Create the High Cost column, using 1 as the identifier if more than 50% of the population is in a high-cost area
         census_df["High Cost"] = census_df.apply(lambda x: 1 if x["County"] in high_cost_dict.keys() and
                                                                 high_cost_dict[x["County"]] >= x[
                                                                     "Total Population"] * 0.5 else 0, axis=1)
 
+        # Create the Tribal column, using 1 as the identifier if more than 50% of the population is tribal
         census_df["Tribal"] = census_df.apply(lambda x: 1 if x["County"] in tribal_dict.keys() and
                                                              tribal_dict[x["County"]] >= x[
                                                                  "Total Population"] * 0.5 else 0, axis=1)
 
+        # Create the ISP Desert column if ISPs Count is 0 and Total Population is not 0
         census_df["ISP Desert"] = census_df.apply(
             lambda x: 0 if x["ISPs Count"] == 0 and (x["Total Population"] > 0) else 1, axis=1)
 
@@ -1512,29 +1534,50 @@ def get_county_panel_internet_data(state_num: str):
     return main_df
 
 
+# This function will determine the income distribution for each state
 def determine_income_threshold(data_dir, data_year):
+    """
+    This function will determine the number of people eligible for ACP in each state based on the income thresholds.
+    :param data_dir: The directory where the data is stored
+    :param data_year: The year of the data
+    :return: None
+    """
+
+    # Open the folder that contains the state data
     state_data_folder = data_dir + f"ACS_PUMS/{data_year}_Data/state_data/"
 
+    # We only want to look at the following states
     states = ["ca", "tx", "oh", "al"]
+
+    # Create a dictionary to store the data
     full_dc = {state + "_" + str(x) + "K": 0 for state in states for x in range(30, 71, 10)}
 
     for state in states:
+
+        # Open the file that contains the county data
         file = f"{state_data_folder}{state}/{state}-eligibility-county.csv"
 
         df = pd.read_csv(file)
 
+        # Create a new column called acp_eligible
         df["acp_eligible"] = 0
 
+        # Determine if the person is eligible for ACP
         df.loc[(df["POVPIP"] <= 200) | (df["has_pap"] == 1) | (df["has_ssip"] == 1) | (df["has_hins4"] == 1) | (
                 df["has_snap"] == 1), "acp_eligible"] = 1
 
+        # Iterate through the income thresholds
         for x in range(30, 71, 10):
+            # Keep only the households whose income is less than the threshold
             df2 = df[df["HH Income"] <= x * 1000]
 
+            # Determine the total number of households
             total_hh = df2["WGTP"].sum()
 
+            # Keep only the households that are eligible for ACP
             df2 = df2[df2["acp_eligible"] == 1]
 
+            # Determine the percentage of households that are eligible for ACP
             full_dc[state + "_" + str(x) + "K"] = round(df2["WGTP"].sum() * 100 / total_hh, 2)
 
     print(full_dc)
