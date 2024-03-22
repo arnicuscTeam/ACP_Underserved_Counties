@@ -309,12 +309,12 @@ def get_census_data_tract(data_dir: str, date: str = "06_30_2023"):
 
     pop_density_df["pop_density"] = pop_density_df["pop_density"].round(2)
 
+    providers_by_tract_folder = data_dir + f"ISP/{date}/Providers_by_State/Providers_by_Tract/"
+
     """
     The 'high_cost_areas_clean.csv' file contains the high cost areas by tract. We only want to keep the 'High Cost'
     column and the 'Tract' column. We use this to identify high cost areas.
     """
-
-    providers_by_tract_folder = data_dir + f"ISP/{date}/Providers_by_State/Providers_by_Tract/"
 
     high_cost_file = data_dir + "Census_Data/Census_Mid_Files/high_cost_areas_clean.csv"
 
@@ -1461,7 +1461,8 @@ def get_census_data_county(data_dir: str, date: str = "06_30_2023"):
         census_df[f"Total ACP Subscribed Households as of {most_recent_date}"] = census_df[
             f"Total ACP Subscribed Households as of {most_recent_date}"].astype(int)
 
-        # Create the High Cost column, using 1 as the identifier if more than 50% of the population is in a high-cost area
+        # Create the High Cost column, using 1 as the identifier if more than 50% of the population is in a high-cost
+        # area
         census_df["High Cost"] = census_df.apply(lambda x: 1 if x["County"] in high_cost_dict.keys() and
                                                                 high_cost_dict[x["County"]] >= x[
                                                                     "Total Population"] * 0.5 else 0, axis=1)
