@@ -256,6 +256,10 @@ def get_census_data_tract(data_dir: str, date: str = "06_30_2023"):
     :return: None
     """
 
+    """
+    The 'Total-ACP-Households-by-tract.csv' file contains the total number of ACP households by tract. We only want to 
+    keep the most recent data for each tract. We will sort the data by 'Data Month' and keep the last row for each tract.
+    """
     acp_folder = data_dir + "ACP_Households/Final_Files/"
     tract_file = acp_folder + "Total-ACP-Households-by-tract.csv"
 
@@ -272,6 +276,11 @@ def get_census_data_tract(data_dir: str, date: str = "06_30_2023"):
     acp_df = acp_df.rename(columns={"Total Subscribers": f"Total ACP Subscribed Households as of {most_recent_date}",
                                     "tract": "Tract"})
 
+    """
+    The 'tract_total_covered_populations.csv' file contains the total covered populations by tract. We only want to keep
+    the value that identifies if the tract is rural or not. We will keep the 'rural' column and the 'geo_id' column.
+    """
+
     covered_pop_folder = data_dir + "Covered_Populations/"
     covered_pop_file = covered_pop_folder + "tract_total_covered_populations.csv"
 
@@ -282,6 +291,11 @@ def get_census_data_tract(data_dir: str, date: str = "06_30_2023"):
 
     # Rename geo_id to tract
     covered_df = covered_df.rename(columns={"geo_id": "Tract"})
+
+    """
+    The 'pop_density_tract.csv' file contains the population density by tract. We only want to keep the 'pop_density'
+    column and the 'tract' column.
+    """
 
     population_density_file = data_dir + "Census_Data/Census_Mid_Files/pop_density_tract.csv"
 
@@ -295,6 +309,11 @@ def get_census_data_tract(data_dir: str, date: str = "06_30_2023"):
 
     pop_density_df["pop_density"] = pop_density_df["pop_density"].round(2)
 
+    """
+    The 'high_cost_areas_clean.csv' file contains the high cost areas by tract. We only want to keep the 'High Cost'
+    column and the 'Tract' column. We use this to identify high cost areas.
+    """
+
     providers_by_tract_folder = data_dir + f"ISP/{date}/Providers_by_State/Providers_by_Tract/"
 
     high_cost_file = data_dir + "Census_Data/Census_Mid_Files/high_cost_areas_clean.csv"
@@ -307,6 +326,11 @@ def get_census_data_tract(data_dir: str, date: str = "06_30_2023"):
         total_high_cost_pop = high_cost_df[high_cost_df["Tract"] == tract]["Population"].sum()
 
         high_cost_dict[tract] = total_high_cost_pop
+
+    """
+    The 'Tribal_Blocks.csv' file contains the total population and housing units for tribal blocks. We only want to keep
+    the 'Population' column and the 'Block' column. We use this to identify tribal blocks.
+    """
 
     tribal_file = data_dir + "Census_Data/Census_Mid_Files/Tribal_Blocks.csv"
 
@@ -348,6 +372,12 @@ def get_census_data_tract(data_dir: str, date: str = "06_30_2023"):
 
     # Iterate through the states
     for key, value in state_dict.items():
+
+        """
+        The f'{value}_Providers_by_Tract.csv' file contains the ISPs by tract. We only want to keep the 'ISPs Count',
+        'ISPs ACP Count', and 'All ISPs' columns. We use this to identify the ISPs in each tract. This file is separated
+        by state, so we need to open each file separately.
+        """
 
         provider_df = pd.read_csv(providers_by_tract_folder + value + "_Providers_by_Tract.csv", dtype=str)
 
@@ -671,8 +701,11 @@ def get_census_data_tract(data_dir: str, date: str = "06_30_2023"):
             if column in vars2.keys():
                 census_df2.rename(columns={column: vars2[column]}, inplace=True)
 
+        # Merge the two dataframes
+
         census_df = census_df.merge(census_df2, on=["state", "county", "tract"], how="left")
 
+        # Create the updated tract column which contains all the information needed
         census_df["state"] = census_df["state"].str.zfill(2)
         census_df["county"] = census_df["county"].str.zfill(3)
         census_df["tract"] = census_df["tract"].str.zfill(6)
@@ -754,6 +787,7 @@ def get_census_data_tract(data_dir: str, date: str = "06_30_2023"):
         census_df = census_df.merge(pop_density_df, on="Tract", how="left")
         census_df = census_df.merge(provider_df, on="Tract", how="left")
 
+        # Fill in the NaN values with 0
         census_df[f"Total ACP Subscribed Households as of {most_recent_date}"] = census_df[
             f"Total ACP Subscribed Households as of {most_recent_date}"].fillna(0)
         census_df[f"Total ACP Subscribed Households as of {most_recent_date}"] = census_df[
@@ -828,6 +862,11 @@ def get_census_data_county(data_dir: str, date: str = "06_30_2023"):
     :return: None
     """
 
+    """
+    The 'Total-ACP-Households-by-county.csv' file contains the total number of ACP households by county. We only want to
+    keep the 'county' and 'Total Subscribers' columns. We use this to identify the ACP households in each county.
+    """
+
     acp_folder = data_dir + "ACP_Households/Final_Files/"
     tract_file = acp_folder + "Total-ACP-Households-by-county.csv"
 
@@ -844,6 +883,11 @@ def get_census_data_county(data_dir: str, date: str = "06_30_2023"):
     acp_df = acp_df.rename(columns={"Total Subscribers": f"Total ACP Subscribed Households as of {most_recent_date}",
                                     "county": "County"})
 
+    """
+    The 'county_total_covered_populations.csv' file contains the total number of covered populations by county. We only
+    want to keep the 'geo_id' and 'rural' columns. We use this to identify the rural populations in each county.
+    """
+
     covered_pop_folder = data_dir + "Covered_Populations/"
     covered_pop_file = covered_pop_folder + "county_total_covered_populations.csv"
 
@@ -854,6 +898,11 @@ def get_census_data_county(data_dir: str, date: str = "06_30_2023"):
 
     # Rename geo_id to tract
     covered_df = covered_df.rename(columns={"geo_id": "County"})
+
+    """
+    The 'pop_density_county.csv' file contains the population density by county. We only want to keep the 'county' and
+    'pop_density' columns. We use this to identify the population density in each county.
+    """
 
     population_density_file = data_dir + "Census_Data/Census_Mid_Files/pop_density_county.csv"
 
@@ -868,6 +917,11 @@ def get_census_data_county(data_dir: str, date: str = "06_30_2023"):
     pop_density_df["pop_density"] = pop_density_df["pop_density"].round(2)
 
     providers_by_county_folder = data_dir + f"ISP/{date}/Providers_by_State/Providers_by_County/"
+
+    """
+    The 'high_cost_areas_clean.csv' file contains the total number of high cost populations by county. We only want to
+    keep the 'County' and 'Population' columns. We use this to identify the high cost populations in each county.
+    """
 
     high_cost_file = data_dir + "Census_Data/Census_Mid_Files/high_cost_areas_clean.csv"
 
@@ -941,6 +995,11 @@ def get_census_data_county(data_dir: str, date: str = "06_30_2023"):
 
     # Iterate through the states
     for key, value in state_dict.items():
+
+        """
+        The f'{value}_Providers_by_County.csv' file contains the total number of ISPs by county. We only want to keep 
+        the 'County', 'ISPs Count', and 'ISPs ACP Count' columns. We use this to identify the ISPs in each county.
+        """
 
         provider_df = pd.read_csv(providers_by_county_folder + value + "_Providers_by_County.csv", dtype=str)
 
